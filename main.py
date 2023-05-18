@@ -59,35 +59,38 @@ def generate_authors():
     fake_authors_list = [fake_authors.name() for _ in range(3)]
     return fake_authors_list
 
-def generator(pk):
+def generator(count=1):
     '''
     Функция генерации словарей
     '''
-    book_list = []
-    for i in range(pk, 100, 1):
-        random_book = {"model": model,
-                       "pk": i,
-                       "fields": {
-                           "title": load_titles(),
-                           "year": generate_publish_year(),
-                           "pages": generate_page_count(),
-                           "isnb13": generate_isbn(),
-                           "rating": generate_rating(),
-                           "price": generate_price(),
-                           "author": generate_authors()}}
-        book_list.append(random_book)
 
-    with open('books.json', 'w', encoding='utf-8') as f:
-        b = json.dumps(book_list, ensure_ascii=False, indent=4)
-        print(b)
-        f.write(b)
+    while True:
+        dict_ = {"model": model,
+                 "pk": count,
+                 "fields": {
+                     "title": load_titles(),
+                     "year": generate_publish_year(),
+                     "pages": generate_page_count(),
+                     "isbn13": generate_isbn(),
+                     "rating": generate_rating(),
+                     "price": generate_price(),
+                     "author": generate_authors()
+                 }
+                 }
+
+        yield dict_
+        count += 1
 
 def main():
     '''
     Функция запуска генератора
     '''
-    pk = int(input("С какой по счету книги начнем?\n"))
-    generator(pk)
+    generator_ = generator()
+    list_ = [next(generator_) for _ in range(100)]
+
+    with open('books.json', 'w', encoding='utf-8') as f:
+        json.dump(list_, f, indent=4, ensure_ascii=False)
+
 
 if __name__ == '__main__':
     main()
